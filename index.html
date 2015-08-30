@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<title>MotionBlur - Goo Create</title>
+<script>
+// If you try to load a scene without a server, you're gonna have a bad time
+if (window.location.protocol==='file:') {
+	alert('You need to run this webpage on a server. Check the code for links and details.');
+	/*
+
+	Loading scenes uses AJAX requests, which require that the webpage is accessed via http. Setting up
+	a web server is not very complicated, and there are lots of free options. Here are some suggestions
+	that will do the job and do it well, but there are lots of other options.
+
+	- Windows
+
+	There's Apache (http://httpd.apache.org/docs/current/platform/windows.html)
+	There's nginx (http://nginx.org/en/docs/windows.html)
+	And for the truly lightweight, there's mongoose (https://code.google.com/p/mongoose/)
+
+	- Linux
+	Most distributions have neat packages for Apache (http://httpd.apache.org/) and nginx
+	(http://nginx.org/en/docs/windows.html) and about a gazillion other options that didn't
+	fit in here.
+	One option is calling 'python -m SimpleHTTPServer' inside the unpacked folder if you have python installed.
+
+
+	- Mac OS X
+
+	Most Mac users will have Apache web server bundled with the OS.
+	Read this to get started: http://osxdaily.com/2012/09/02/start-apache-web-server-mac-os-x/
+
+	*/
+}
+
+// Use goo without require. Needed to make pack dependencies in external scripts work.
+window.goo = {useOwnRequire: true};
+</script>
+
+<!-- disable native mobile pinch-to-zoom, replacing with the Goo Engine zoom -->
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<!-- og -->
+
+<meta property="og:image" content="res/1f032a6ca477911a7489324c137bae00d0854c94.png">
+
+
+
+
+<meta property="og:title" content="MotionBlur"/>
+<meta property="og:description" content="Made with Goo Create">
+<meta property="og:updated_time" content="2015-07-07T20:50:14.207388+00:00"/>
+<meta property="og:site_name" content="Goo Create"/>
+<meta property="og:type" content="website"/>
+<!-- /og -->
+<link rel="icon" href="favicon.png" type="image/png" />
+<link rel="stylesheet" type="text/css" href="style/style.css">
+
+<script src="lib/goo.js"></script>
+<script src="lib/cannon.min.js"></script>
+<script src="lib/fsmpack.js"></script>
+<script src="lib/quadpack.js"></script>
+<script src="lib/timelinepack.js"></script>
+<script src="lib/scriptpack.js"></script>
+<script src="lib/passpack.js"></script>
+<script src="lib/animationpack.js"></script>
+<script src="lib/physicspack.js"></script>
+
+</head>
+
+<body >
+	<div id="goo-loading-overlay" class="loading">
+		<div id="goo-loading-message">
+			<h1>MotionBlur</h1>
+
+			<h2>Loading</h2>
+			<div id="progress-bar">
+				<div id="progress"></div>
+			</div>
+		</div>
+	</div>
+	<div id="canvas-outer" class="hidden">
+		<div id="canvas-inner">
+
+		</div>
+	</div>
+
+	<div id="fallback" data-background="url(res/1f032a6ca477911a7489324c137bae00d0854c94.png)">
+
+		<div class="fallback-overlay">
+			<div class="fallback-content">
+
+				<h1>No 3D Magic?</h1>
+
+				<div id="no-rendering-context" class="error-case">
+					<p class="error-msg">
+						We could not find a WebGL rendering context.<br/>
+						Check out the link below for some help to get things running.
+					</p>
+					<ul class="help-links">
+						<li class="no-margin">
+							<a target="_blank" href="http://get.webgl.org/troubleshooting">WebGL troubleshooting</a>
+						</li>
+					</ul>
+				</div>
+
+				<div id="webgl-disabled" class="error-case">
+					<p class="error-msg">
+						WebGL seems to be disabled. Check out the link below, for some guidance on solving this problem.
+					</p>
+
+
+					<ul class="help-links">
+						<li class="no-margin">
+							<a target="_blank" href="http://get.webgl.org/troubleshooting">WebGL troubleshooting</a>
+						</li>
+					</ul>
+				</div>
+
+				<div id="webgl-disabled-chrome" class="error-case">
+
+					<p class="error-msg">
+						WebGL seems to be disabled! To enable it, follow these steps:
+					</p>
+
+					<ul class="help-steps">
+						<li>
+							Open a new tab, and enter chrome://flags.
+						</li>
+						<li>
+							Find the post disable WebGL, if it is enabled, disable it.
+						</li>
+						<li>
+							Restart chrome. After restarting, the scene you were trying to reach here, should load. If not, you will unfortunately need to read the next step.
+						</li>
+
+						<li>
+							Open a new tab and enter chrome://gpu. Under Graphics Feature Status you will find the post WebGL. If the status of WebGL in the feature status still states Hardware acceleration disabled after making sure that the disable WebGL flag is not enabled, your graphics card is probably not supported or running properly.
+						</li>
+
+					</ul>
+
+					<ul class="help-links">
+						<li><a target="_blank" href="http://get.webgl.org/troubleshooting">WebGL troubleshooting</a></li>
+						<li><a target="_blank" href="http://answers.goocreate.com/">Goo Q&amp;A</a></li>
+					</ul>
+				</div>
+
+				<div id="webgl-disabled-safari" class="error-case">
+					<p class="error-msg">
+						WebGL seems to be disabled! To enable it, follow these steps:
+					</p>
+
+					<ul class="help-steps">
+						<li>Open the Safari menu.</li>
+						<li>Select Preferences.</li>
+						<li>Open the Advanced tab.</li>
+						<li>Enable the Developer menu by checking the Show Develop menu in menu bar checkbox.</li>
+						<li>Open the Develop menu in the menu bar.</li>
+						<li>Select Enable WebGL.</li>
+						<li>You will then may have to restart your browser to enable the changes.</li>
+						<li>If this has not worked for you, try checking out...</li>
+					</ul>
+
+					<ul class="help-links">
+						<li><a target="_blank" href="http://get.webgl.org/troubleshooting">WebGL troubleshooting</a></li>
+						<li><a target="_blank" href="http://answers.goocreate.com/">Goo Q&amp;A</a></li>
+					</ul>
+
+				</div>
+
+				<div id="ios-error" class="error-case">
+					<p class="error-msg">
+						You will need to run iOS 8 or greater to take advantage of WebGL.<br/>
+					</p>
+
+					<p class="error-msg">
+						The release date of iOS 8 is <a target="_blank" href="http://www.macworld.co.uk/news/iosapps/ios-8-release-date-rumours-leaked-images-3495266/">rumored</a> to be some time during this autumn.
+					</p>
+				</div>
+			</div>
+		</div>
+		<script src="js/CanvasWrapper.js"></script>
+		<script src="js/WebGLSupport.js"></script>
+		<script src="js/GSRVMock.js"></script>
+		<!--[if IE 9]><script src="js/shims.js"></script><![endif]-->
+		<script src="js/loadScene.js"></script>
+	</body>
+</html>
